@@ -17,7 +17,6 @@
  */
 package org.azkfw.dsql;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,12 +24,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.commons.digester3.Digester;
 import org.azkfw.context.Context;
 import org.azkfw.dsql.entity.DSQLEntity;
-import org.azkfw.dsql.entity.DSQLLineEntity;
 import org.azkfw.lang.LoggingObject;
 import org.azkfw.persistence.entity.Entity;
 import org.azkfw.util.StringUtility;
@@ -44,11 +41,6 @@ import org.xml.sax.SAXException;
  * @author Kawakicchi
  */
 public final class DynamicSQLManager extends LoggingObject {
-
-	/**
-	 * Dyanamic pattern
-	 */
-	private static Pattern PATTERN = Pattern.compile("^\\$\\{.*\\}.*$");
 
 	/**
 	 * Instance
@@ -164,58 +156,8 @@ public final class DynamicSQLManager extends LoggingObject {
 			}
 			InputStream is = aContext.getResourceAsStream(entity.getFile());
 			if (null != is) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-				String line = null;
-				DSQLEntity dsql = new DSQLEntity();
-				while (null != (line = reader.readLine())) {
-					String buf = line.trim();
-					DSQLLineEntity dsqll = new DSQLLineEntity();
-					if (buf.startsWith("#")) {
-						dsqll.setComment(true);
-						dsqll.setString(line);
-					} else {
-						if (PATTERN.matcher(buf).matches()) {
-							int index = buf.indexOf("}");
-							String sql = buf.substring(index + 1).trim();
-							String cnt = buf.substring(2, index).trim();
-							index = cnt.indexOf(":");
-							if (0 == index) {
-								String param = cnt.substring(1).trim();
-								dsqll.setComment(false);
-								dsqll.setParameter(param);
-								dsqll.setSql(sql);
-								dsqll.setString(line);
-							} else if (cnt.length() - 1 == index) {
-								String group = cnt.substring(0, cnt.length() - 1);
-								dsqll.setComment(false);
-								dsqll.setGroup(group);
-								dsqll.setSql(sql);
-								dsqll.setString(line);
-							} else if (-1 == index) {
-								dsqll.setComment(false);
-								dsqll.setParameter(cnt);
-								dsqll.setSql(sql);
-								dsqll.setString(line);
-							} else {
-								String[] splt = cnt.split(":");
-								String group = splt[0];
-								String param = splt[1];
-								dsqll.setComment(false);
-								dsqll.setGroup(group);
-								dsqll.setParameter(param);
-								dsqll.setSql(sql);
-								dsqll.setString(line);
-							}
-						} else {
-							dsqll.setComment(false);
-							dsqll.setSql(buf);
-							dsqll.setString(line);
-						}
-					}
-					dsql.add(dsqll);
-				}
+				DSQLEntity dsql = DSQLEntity.getInstance(new InputStreamReader(is));
 				dynamicSQLs.put(entity.getName(), dsql);
-				reader.close();
 			} else {
 				error("Not found dynamicSQL file.[" + entity.getFile() + "]");
 				throw new IOException("Not found dynamicSQL file.[" + entity.getFile() + "]");

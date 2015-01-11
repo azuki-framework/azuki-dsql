@@ -17,9 +17,16 @@
  */
 package org.azkfw.dsql.entity;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.azkfw.persistence.entity.Entity;
 import org.azkfw.util.StringUtility;
@@ -34,6 +41,11 @@ import org.azkfw.util.StringUtility;
 public final class DSQLEntity implements Entity, Iterable<DSQLLineEntity> {
 
 	/**
+	 * Dyanamic pattern
+	 */
+	private static Pattern PATTERN = Pattern.compile("^\\$\\{.*\\}.*$");
+
+	/**
 	 * 名前
 	 */
 	private String name;
@@ -46,7 +58,7 @@ public final class DSQLEntity implements Entity, Iterable<DSQLLineEntity> {
 	/**
 	 * コンストラクタ
 	 */
-	public DSQLEntity() {
+	private DSQLEntity() {
 		name = null;
 		lines = new ArrayList<DSQLLineEntity>();
 	}
@@ -87,5 +99,68 @@ public final class DSQLEntity implements Entity, Iterable<DSQLLineEntity> {
 	@Override
 	public Iterator<DSQLLineEntity> iterator() {
 		return lines.iterator();
+	}
+
+	public static DSQLEntity getInstance(final File file) throws IOException {
+		return getInstance(new InputStreamReader(new FileInputStream(file)));
+	}
+
+	public static DSQLEntity getInstance(final File file, final Charset charset) throws IOException {
+		return getInstance(new InputStreamReader(new FileInputStream(file), charset));
+	}
+
+	public static DSQLEntity getInstance(final InputStreamReader aReader) throws IOException {
+		BufferedReader reader = new BufferedReader(aReader);
+		DSQLEntity dsql = new DSQLEntity();
+		String line = null;
+		while (null != (line = reader.readLine())) {
+			String buf = line.trim();
+			DSQLLineEntity dsqll = new DSQLLineEntity();
+			if (buf.startsWith("#")) {
+				dsqll.setComment(true);
+				dsqll.setString(line);
+			} else {
+				if (PATTERN.matcher(buf).matches()) {
+					int index = buf.indexOf("}");
+					String sql = buf.substring(index + 1).trim();
+					String cnt = buf.substring(2, index).trim();
+					index = cnt.indexOf(":");
+					if (0 == index) {
+						String param = cnt.substring(1).trim();
+						dsqll.setComment(false);
+						dsqll.setParameter(param);
+						dsqll.setSql(sql);
+						dsqll.setString(line);
+					} else if (cnt.length() - 1 == index) {
+						String group = cnt.substring(0, cnt.length() - 1);
+						dsqll.setComment(false);
+						dsqll.setGroup(group);
+						dsqll.setSql(sql);
+						dsqll.setString(line);
+					} else if (-1 == index) {
+						dsqll.setComment(false);
+						dsqll.setParameter(cnt);
+						dsqll.setSql(sql);
+						dsqll.setString(line);
+					} else {
+						String[] splt = cnt.split(":");
+						String group = splt[0];
+						String param = splt[1];
+						dsqll.setComment(false);
+						dsqll.setGroup(group);
+						dsqll.setParameter(param);
+						dsqll.setSql(sql);
+						dsqll.setString(line);
+					}
+				} else {
+					dsqll.setComment(false);
+					dsqll.setSql(buf);
+					dsqll.setString(line);
+				}
+			}
+			dsql.add(dsqll);
+		}
+		reader.close();
+		return dsql;
 	}
 }

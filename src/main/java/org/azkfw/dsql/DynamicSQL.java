@@ -103,6 +103,7 @@ public final class DynamicSQL {
 			StringBuilder sql = new StringBuilder();
 			List<Object> params = new ArrayList<Object>();
 			for (DSQLLineEntity line : entity) {
+				String lineSql = line.getSQL();
 				if (line.isComment()) {
 					continue;
 				}
@@ -121,9 +122,23 @@ public final class DynamicSQL {
 					if (!aParameter.isKey(line.getParameter())) {
 						continue;
 					}
-					params.add(aParameter.get(line.getParameter()));
+					Object obj = aParameter.get(line.getParameter());
+					if (obj instanceof List<?>) {
+						List<?> list = (List<?>) obj;
+						StringBuilder sb = new StringBuilder();
+						for (int i = 0; i < list.size(); i++) {
+							if (i != 0) {
+								sb.append(", ");
+							}
+							sb.append("?");
+							params.add(list.get(i));
+						}
+						lineSql = lineSql.replaceAll("\\?", sb.toString());
+					} else {
+						params.add(obj);
+					}
 				}
-				sql.append(line.getSQL());
+				sql.append(lineSql);
 				sql.append(" ");
 			}
 
