@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.azkfw.persistence.entity.Entity;
 import org.azkfw.util.StringUtility;
 
 /**
@@ -38,7 +37,7 @@ import org.azkfw.util.StringUtility;
  * @version 1.0.0 2013/02/14
  * @author Kawakicchi
  */
-public final class DSQLEntity implements Entity, Iterable<DSQLLineEntity> {
+public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 
 	/**
 	 * Dyanamic pattern
@@ -85,7 +84,6 @@ public final class DSQLEntity implements Entity, Iterable<DSQLLineEntity> {
 		lines.add(aLine);
 	}
 
-	@Override
 	public boolean isEmpty() {
 		if (StringUtility.isNotEmpty(name)) {
 			return false;

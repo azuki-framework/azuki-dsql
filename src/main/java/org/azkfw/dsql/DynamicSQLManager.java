@@ -29,7 +29,6 @@ import org.apache.commons.digester3.Digester;
 import org.azkfw.context.Context;
 import org.azkfw.dsql.entity.DSQLEntity;
 import org.azkfw.lang.LoggingObject;
-import org.azkfw.persistence.entity.Entity;
 import org.azkfw.util.StringUtility;
 import org.xml.sax.SAXException;
 
@@ -184,7 +183,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @version 1.0.0 2013/02/15
 	 * @author Kawakicchi
 	 */
-	public static class DynamicSQLEntity implements Entity {
+	public static class DynamicSQLEntity {
 
 		private String name;
 

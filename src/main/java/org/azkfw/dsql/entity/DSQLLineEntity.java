@@ -17,7 +17,6 @@
  */
 package org.azkfw.dsql.entity;
 
-import org.azkfw.persistence.entity.Entity;
 import org.azkfw.util.StringUtility;
 
 /**
@@ -27,7 +26,7 @@ import org.azkfw.util.StringUtility;
  * @version 1.0.0 2013/02/14
  * @author Kawakicchi
  */
-public final class DSQLLineEntity implements Entity {
+public final class DSQLLineEntity {
 
 	/**
 	 * 行文字列
@@ -134,7 +133,6 @@ public final class DSQLLineEntity implements Entity {
 		return parameter;
 	}
 
-	@Override
 	public boolean isEmpty() {
 		return false;
 	}
