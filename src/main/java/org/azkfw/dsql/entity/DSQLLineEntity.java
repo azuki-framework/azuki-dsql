@@ -29,19 +29,24 @@ import org.azkfw.util.StringUtility;
 public final class DSQLLineEntity {
 
 	/**
-	 * 行文字列
+	 * 未加工の行文字列
 	 */
-	private String string;
+	private String line;
+
+	/**
+	 * SQL文字列(trim済み)
+	 */
+	private String sql;
+
+	/**
+	 * SQL文字列
+	 */
+	private String formatSql;
 
 	/**
 	 * コメント
 	 */
 	private boolean comment;
-
-	/**
-	 * SQL文字列
-	 */
-	private String sql;
 
 	/**
 	 * グループ名
@@ -60,33 +65,57 @@ public final class DSQLLineEntity {
 
 	}
 
-	public void setString(final String aString) {
-		string = aString;
-	}
-
-	public void setComment(final boolean aComment) {
-		comment = aComment;
-	}
-
-	public void setSql(final String aSql) {
-		sql = aSql;
-	}
-
-	public void setGroup(final String aGroup) {
-		group = aGroup;
-	}
-
-	public void setParameter(final String aParameter) {
-		parameter = aParameter;
+	/**
+	 * 行文字列(未加工)を設定する。
+	 * 
+	 * @param line 行文字列
+	 */
+	public void setLine(final String line) {
+		this.line = line;
 	}
 
 	/**
-	 * 行の文字列を取得する。
+	 * 行文字列(未加工)を取得する。
+	 * 
+	 * @return 行文字列
+	 */
+	public String getLine() {
+		return line;
+	}
+
+	public void setFormatSQL(final String sql) {
+		formatSql = sql;
+	}
+
+	/**
+	 * SQL文字列(バインドキーなし)を取得する。
+	 * 
+	 * @return
+	 */
+	public String getFormatSQL() {
+		return formatSql;
+	}
+
+	/**
+	 * SQL文字列(trim済み)を設定する。
+	 * 
+	 * @param sql
+	 */
+	public void setSQL(final String sql) {
+		this.sql = sql;
+	}
+
+	/**
+	 * SQL部分の文字列(trim済み、バインドキーなし)を取得する。
 	 * 
 	 * @return 文字列
 	 */
-	public String getString() {
-		return string;
+	public String getSQL() {
+		return sql;
+	}
+
+	public void setComment(final boolean comment) {
+		this.comment = comment;
 	}
 
 	/**
@@ -98,13 +127,12 @@ public final class DSQLLineEntity {
 		return comment;
 	}
 
-	/**
-	 * SQL部分の文字列を取得する。
-	 * 
-	 * @return 文字列
-	 */
-	public String getSQL() {
-		return sql;
+	public void setGroup(final String group) {
+		this.group = group;
+	}
+
+	public String getGroup() {
+		return group;
 	}
 
 	/**
@@ -116,6 +144,14 @@ public final class DSQLLineEntity {
 		return StringUtility.isNotEmpty(group);
 	}
 
+	public void setParameter(final String parameter) {
+		this.parameter = parameter;
+	}
+
+	public String getParameter() {
+		return parameter;
+	}
+
 	/**
 	 * パラメータが有効か判断する。
 	 * 
@@ -123,14 +159,6 @@ public final class DSQLLineEntity {
 	 */
 	public boolean isParameter() {
 		return StringUtility.isNotEmpty(parameter);
-	}
-
-	public String getGroup() {
-		return group;
-	}
-
-	public String getParameter() {
-		return parameter;
 	}
 
 	public boolean isEmpty() {

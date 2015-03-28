@@ -17,133 +17,50 @@
  */
 package org.azkfw.dsql;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.azkfw.dsql.entity.DSQLEntity;
-import org.azkfw.dsql.entity.DSQLLineEntity;
-
 /**
- * このクラスは、ダイナミックSQL情報を保持するクラスです。
+ * このインターフェースは、ダイナミックSQLを定義するインターフェースです。
  * 
  * @since 1.0.0
  * @version 1.0.0 2013/02/14
  * @author Kawakicchi
  */
-public final class DynamicSQL {
+public interface DynamicSQL {
 
 	/**
-	 * DynamicSQL名
-	 */
-	private String name;
-
-	/**
-	 * SQL
-	 */
-	private String sql;
-
-	/**
-	 * パラメータ
-	 */
-	private List<Object> parameters;
-
-	/**
-	 * コンストラクタ
+	 * 名前空間を取得する。
 	 * 
-	 * @param aName 名前
-	 * @param aSql SQL文
-	 * @param aParameters パラメータ
+	 * @return 名前空間
 	 */
-	private DynamicSQL(final String aName, final String aSql, final List<Object> aParameters) {
-		name = aName;
-		sql = aSql;
-		parameters = new ArrayList<Object>(aParameters);
-	}
+	public String getNamespace();
 
 	/**
 	 * 名前を取得する。
 	 * 
 	 * @return 名前
 	 */
-	public String getName() {
-		return name;
-	}
+	public String getName();
 
 	/**
-	 * SQL文を取得する。
+	 * 実行用SQLを取得する。
 	 * 
-	 * @return SQL文
+	 * @return SQL
 	 */
-	public String getSQL() {
-		return sql;
-	}
+	public String getExecuteSQL();
+
+	/**
+	 * 整形済みSQLを取得する。
+	 * 
+	 * @return SQL
+	 */
+	public String getFormatSQL();
 
 	/**
 	 * パラメータを取得する。
 	 * 
 	 * @return パラメータ
 	 */
-	public List<Object> getParameters() {
-		return parameters;
-	}
+	public List<Object> getParameters();
 
-	/**
-	 * ダイナミックSQLを生成する。
-	 * 
-	 * @param aName 名前
-	 * @param aGroup グループ
-	 * @param aParameter パラメータ
-	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
-	 */
-	public static DynamicSQL generate(final String aName, final Group aGroup, final Parameter aParameter) {
-		DynamicSQL dsql = null;
-		DSQLEntity entity = DynamicSQLManager.get(aName);
-		if (null != entity) {
-
-			StringBuilder sql = new StringBuilder();
-			List<Object> params = new ArrayList<Object>();
-			for (DSQLLineEntity line : entity) {
-				String lineSql = line.getSQL();
-				if (line.isComment()) {
-					continue;
-				}
-				if (line.isGroup()) {
-					if (null == aGroup) {
-						continue;
-					}
-					if (!aGroup.is(line.getGroup())) {
-						continue;
-					}
-				}
-				if (line.isParameter()) {
-					if (null == aParameter) {
-						continue;
-					}
-					if (!aParameter.isKey(line.getParameter())) {
-						continue;
-					}
-					Object obj = aParameter.get(line.getParameter());
-					if (obj instanceof List<?>) {
-						List<?> list = (List<?>) obj;
-						StringBuilder sb = new StringBuilder();
-						for (int i = 0; i < list.size(); i++) {
-							if (i != 0) {
-								sb.append(", ");
-							}
-							sb.append("?");
-							params.add(list.get(i));
-						}
-						lineSql = lineSql.replaceAll("\\?", sb.toString());
-					} else {
-						params.add(obj);
-					}
-				}
-				sql.append(lineSql);
-				sql.append(" ");
-			}
-
-			dsql = new DynamicSQL(aName, sql.toString(), params);
-		}
-		return dsql;
-	}
 }

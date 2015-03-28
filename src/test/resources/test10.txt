@@ -1,0 +1,42 @@
+# コメント行
+ # コメント行（スペース)
+  # コメント行（2スペース）
+	# コメント行（タブ）
+		# コメント行（2タブ）
+ 	# コメント行（スペース・タブ）
+
+ 
+  
+	
+		
+${group:}
+${group:} line
+${ group : } スペース
+${  group  :  } 2スペース
+${	group	:	} タブ
+${		group		:		} 2タブ
+${ 	group 	: 	} スペース・タブ
+
+${param}
+${param} line
+${ param } スペース
+${  param  } 2スペース
+${	param	} タブ
+${		param		} 2タブ
+${ 	param 	} スペース・タブ
+
+${:param}
+${:param} line
+${ : param } スペース
+${  :  param  } 2スペース
+${	:	param	} タブ
+${		:		param		} 2タブ
+${ 	: 	param 	} スペース・タブ
+
+${group:param}
+${group:param} line
+${ group : param } スペース
+${  group  :  param  } 2スペース
+${	group	:	param	} タブ
+${		group		:		param		} 2タブ
+${ 	group 	: 	param 	} スペース・タブ

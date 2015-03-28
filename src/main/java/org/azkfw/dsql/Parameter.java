@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * このクラスは、パラメータ情報を保持するクラスです。
+ * このクラスは、DynamicSQLパラメータ情報を保持するクラスです。
  * 
  * @since 1.0.0
  * @version 1.0.0 2013/02/14
@@ -45,49 +45,58 @@ public final class Parameter {
 	/**
 	 * コンストラクタ
 	 * 
-	 * @param aParameter パラメータ
+	 * @param parameter パラメータ
 	 */
-	public Parameter(final Map<String, Object> aParameter) {
-		params = new HashMap<String, Object>(aParameter);
+	public Parameter(final Map<String, Object> parameter) {
+		params = new HashMap<String, Object>(parameter);
 	}
 
 	/**
 	 * コンストラクタ
 	 * 
-	 * @param aParameter パラメータ
+	 * @param parameter パラメータ
 	 */
-	public Parameter(final Parameter aParameter) {
-		params = new HashMap<String, Object>(aParameter.params);
+	public Parameter(final Parameter parameter) {
+		params = new HashMap<String, Object>(parameter.params);
 	}
 
 	/**
 	 * パラメータが存在するか判断する。
 	 * 
-	 * @param aKey キー
+	 * @param key キー
 	 * @return パラメータが存在する場合、<code>true</code>を返す。
 	 */
-	public boolean isKey(final String aKey) {
-		return params.containsKey(aKey);
+	public boolean isKey(final String key) {
+		return params.containsKey(key);
 	}
 
 	/**
 	 * パラメータを設定する。
 	 * 
-	 * @param aKey キー
-	 * @param aValue 値
+	 * @param key キー
+	 * @param value 値
 	 */
-	public void put(final String aKey, final Object aValue) {
-		params.put(aKey, aValue);
+	public void put(final String key, final Object value) {
+		params.put(key, value);
 	}
 
 	/**
 	 * パラメータを取得する。
 	 * 
-	 * @param aKey キー
+	 * @param key キー
 	 * @return 値
 	 */
-	public Object get(final String aKey) {
-		return params.get(aKey);
+	public Object get(final String key) {
+		return params.get(key);
+	}
+
+	/**
+	 * パラメータを削除する
+	 * 
+	 * @param key キー
+	 */
+	public void remove(final String key) {
+		params.remove(key);
 	}
 
 	/**

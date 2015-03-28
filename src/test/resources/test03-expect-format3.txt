@@ -1,0 +1,10 @@
+                SELECT
+                    A.id
+                  , A.name
+                FROM
+                    table A
+                WHERE
+                    A.name like '%' & ? & '%'
+                AND A.age
+                    BETWEEN ?
+                    AND     ?

@@ -1,0 +1,6 @@
+                SELECT
+                    count(*)
+                FROM
+                    table A
+                WHERE
+                    A.name like '%' & ? & '%'

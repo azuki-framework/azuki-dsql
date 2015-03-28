@@ -35,22 +35,21 @@ public final class DynamicSQLPlugin extends AbstractPlugin {
 	 * コンストラクタ
 	 */
 	public DynamicSQLPlugin() {
-
 	}
 
 	@Override
 	protected void doInitialize() throws PluginServiceException {
-		DynamicSQLManager.initialize();
+		DynamicSQLManager.getInstance().initialize();
 	}
 
 	@Override
 	protected void doDestroy() throws PluginServiceException {
-		DynamicSQLManager.destroy();
+		DynamicSQLManager.getInstance().destroy();
 	}
 
 	@Override
 	protected void doLoad() throws PluginServiceException, IOException {
-		DynamicSQLManager.load(getConfiguration().getResourceAsStream(), getContext());
+		DynamicSQLManager.getInstance().load(getConfiguration().getResourceAsStream(), getContext());
 	}
 
 }

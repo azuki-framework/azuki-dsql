@@ -49,7 +49,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	/**
 	 * ダイナミックSQL情報
 	 */
-	private Map<String, DSQLEntity> dynamicSQLs = new HashMap<String, DSQLEntity>();
+	private Map<String, Map<String, DSQLEntity>> dynamicSQLs;
 
 	/**
 	 * コンストラクタ
@@ -59,86 +59,211 @@ public final class DynamicSQLManager extends LoggingObject {
 	 */
 	private DynamicSQLManager() {
 		super(DynamicSQLManager.class);
+
+		dynamicSQLs = new HashMap<String, Map<String, DSQLEntity>>();
 	}
 
 	/**
-	 * 初期化処理を行なう。
-	 */
-	public static void initialize() {
-
-	}
-
-	/**
-	 * 解放処理を行なう。
-	 */
-	public static void destroy() {
-
-	}
-
-	/**
-	 * 設定をロードする。
+	 * インスタンスを取得する。
 	 * 
-	 * @param aConfig 設定ファイル
-	 * @param aContext コンテキスト
-	 * @throws IOException IO操作時に問題が発生した場合
+	 * @return インスタンス
 	 */
-	public static void load(final String aConfig, final Context aContext) throws IOException {
-		INSTANCE.doLoad(aConfig, aContext);
-	}
-
-	/**
-	 * 設定をロードする。
-	 * 
-	 * @param aStream ストリーム
-	 * @param aContext コンテキスト
-	 * @throws IOException IO操作時に問題が発生した場合
-	 */
-	public static void load(final InputStream aStream, final Context aContext) throws IOException {
-		INSTANCE.doLoad(aStream, aContext);
+	public static DynamicSQLManager getInstance() {
+		return INSTANCE;
 	}
 
 	/**
 	 * ダイナミックSQLを生成する。
 	 * 
-	 * @param aName 名前
-	 * @return ダイナミックSQL
+	 * @param name 名前
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
 	 */
-	public static DSQLEntity get(final String aName) {
-		return INSTANCE.doGet(aName);
+	public static DynamicSQL generate(final String name) {
+		return generate(null, name, null, null);
 	}
 
 	/**
-	 * 設定をロードする。
+	 * ダイナミックSQLを生成する。
 	 * 
-	 * @param aConfig 設定ファイル
-	 * @param aContext コンテキスト
-	 * @throws IOException IO操作時に問題が発生した場合
+	 * @param name 名前
+	 * @param group グループ
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
 	 */
-	private void doLoad(final String aConfig, final Context aContext) throws IOException {
-		InputStream stream = aContext.getResourceAsStream(aConfig);
-		if (null == stream) {
-			error("Not found dynamicSQL file.[" + aConfig + "]");
-			throw new IOException("Not found dynamicSQL file.[" + aConfig + "]");
+	public static DynamicSQL generate(final String name, final Group group) {
+		return generate(null, name, group, null);
+	}
+
+	/**
+	 * ダイナミックSQLを生成する。
+	 * 
+	 * @param name 名前
+	 * @param parameter パラメータ
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
+	 */
+	public static DynamicSQL generate(final String name, final Parameter parameter) {
+		return generate(null, name, null, parameter);
+	}
+
+	/**
+	 * ダイナミックSQLを生成する。
+	 * 
+	 * @param name 名前
+	 * @param group グループ
+	 * @param parameter パラメータ
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
+	 */
+	public static DynamicSQL generate(final String name, final Group group, final Parameter parameter) {
+		return generate(null, name, group, parameter);
+	}
+
+	/**
+	 * ダイナミックSQLを生成する。
+	 * 
+	 * @param namespace 名前空間
+	 * @param name 名前
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
+	 */
+	public static DynamicSQL generate(final String namespace, final String name) {
+		return generate(namespace, name, null, null);
+	}
+
+	/**
+	 * ダイナミックSQLを生成する。
+	 * 
+	 * @param namespace 名前空間
+	 * @param name 名前
+	 * @param group グループ
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
+	 */
+	public static DynamicSQL generate(final String namespace, final String name, final Group group) {
+		return generate(namespace, name, group, null);
+	}
+
+	/**
+	 * ダイナミックSQLを生成する。
+	 * 
+	 * @param namespace 名前空間
+	 * @param name 名前
+	 * @param parameter パラメータ
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
+	 */
+	public static DynamicSQL generate(final String namespace, final String name, final Parameter parameter) {
+		return generate(namespace, name, null, parameter);
+	}
+
+	/**
+	 * ダイナミックSQLを生成する。
+	 * 
+	 * @param namespace 名前空間
+	 * @param name 名前
+	 * @param group グループ
+	 * @param parameter パラメータ
+	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
+	 */
+	public static DynamicSQL generate(final String namespace, final String name, final Group group, final Parameter parameter) {
+		DynamicSQL dsql = null;
+		DSQLEntity entity = INSTANCE.get(namespace, name);
+		if (null != entity) {
+			dsql = DynamicSQLBuilder.build(namespace, name, entity, group, parameter);
 		}
-		doLoad(stream, aContext);
+		return dsql;
+	}
+
+	/**
+	 * 初期化処理を行なう。
+	 */
+	public void initialize() {
+		dynamicSQLs.clear();
+	}
+
+	/**
+	 * 解放処理を行なう。
+	 */
+	public void destroy() {
+		dynamicSQLs.clear();
 	}
 
 	/**
 	 * 設定をロードする。
 	 * 
-	 * @param aStream 設定ファイル
-	 * @param aContext コンテキスト
+	 * @param config 設定ファイル
+	 * @param context コンテキスト
 	 * @throws IOException IO操作時に問題が発生した場合
 	 */
-	private void doLoad(final InputStream aStream, final Context aContext) throws IOException {
-		List<DynamicSQLEntity> dsqls = null;
+	public void load(final String config, final Context context) throws IOException {
+		doLoad(null, config, context);
+	}
+
+	/**
+	 * 設定をロードする。
+	 * 
+	 * @param namespace 名前空間
+	 * @param config 設定ファイル
+	 * @param context コンテキスト
+	 * @throws IOException IO操作時に問題が発生した場合
+	 */
+	public void load(final String namespace, final String config, final Context context) throws IOException {
+		doLoad(namespace, config, context);
+	}
+
+	/**
+	 * 設定をロードする。
+	 * 
+	 * @param stream ストリーム
+	 * @param context コンテキスト
+	 * @throws IOException IO操作時に問題が発生した場合
+	 */
+	public void load(final InputStream stream, final Context context) throws IOException {
+		doLoad(null, stream, context);
+	}
+
+	/**
+	 * 設定をロードする。
+	 * 
+	 * @param namespace 名前空間
+	 * @param stream ストリーム
+	 * @param context コンテキスト
+	 * @throws IOException IO操作時に問題が発生した場合
+	 */
+	public void load(final String namespace, final InputStream stream, final Context context) throws IOException {
+		doLoad(namespace, stream, context);
+	}
+
+	/**
+	 * 設定をロードする。
+	 * 
+	 * @param namespace 名前空間
+	 * @param config 設定ファイル
+	 * @param context コンテキスト情報
+	 * @throws IOException IO操作時に問題が発生した場合
+	 */
+	private void doLoad(final String namespace, final String config, final Context context) throws IOException {
+		InputStream stream = context.getResourceAsStream(config);
+		if (null == stream) {
+			String msg = String.format("Not found dynamicSQL file.[%s]", config);
+			error(msg);
+			throw new IOException(msg);
+		}
+		doLoad(namespace, stream, context);
+	}
+
+	/**
+	 * 設定をロードする。
+	 * 
+	 * @param namespace 名前空間
+	 * @param stream 設定ファイル
+	 * @param context コンテキスト情報
+	 * @throws IOException IO操作時に問題が発生した場合
+	 */
+	private synchronized void doLoad(final String namespace, final InputStream stream, final Context context) throws IOException {
+		List<DynamicSQLXMLEntity> dsqls = null;
 		try {
 			Digester digester = new Digester();
 			digester.addObjectCreate("azuki/dynamicSQLs", ArrayList.class);
-			digester.addObjectCreate("azuki/dynamicSQLs/dynamicSQL", DynamicSQLEntity.class);
+			digester.addObjectCreate("azuki/dynamicSQLs/dynamicSQL", DynamicSQLXMLEntity.class);
 			digester.addSetProperties("azuki/dynamicSQLs/dynamicSQL");
 			digester.addSetNext("azuki/dynamicSQLs/dynamicSQL", "add");
-			dsqls = digester.parse(aStream);
+			dsqls = digester.parse(stream);
 		} catch (SAXException ex) {
 			error(ex);
 			throw new IOException(ex);
@@ -147,33 +272,64 @@ public final class DynamicSQLManager extends LoggingObject {
 			throw ex;
 		}
 
-		for (DynamicSQLEntity entity : dsqls) {
-			info("DynamicSQL loading.[" + entity.getName() + "]");
-			if (dynamicSQLs.containsKey(entity.getName())) {
-				error("Duplicate dynamicSQL name.[" + entity.getName() + "]");
+		Map<String, DSQLEntity> dsqlsMap = null;
+		if (dynamicSQLs.containsKey(namespace)) {
+			dsqlsMap = dynamicSQLs.get(namespace);
+		} else {
+			dsqlsMap = new HashMap<String, DSQLEntity>();
+			dynamicSQLs.put(namespace, dsqlsMap);
+		}
+
+		for (DynamicSQLXMLEntity entity : dsqls) {
+			info(String.format("DynamicSQL loading.[ns:%s, name:%s]", s(namespace), entity.getName()));
+
+			if (dsqlsMap.containsKey(entity.getName())) {
+				error(String.format("Duplicate dynamicSQL name.[ns:%s, name:%s]", s(namespace), entity.getName()));
 				continue;
 			}
-			InputStream is = aContext.getResourceAsStream(entity.getFile());
-			if (null != is) {
-				DSQLEntity dsql = DSQLEntity.getInstance(new InputStreamReader(is));
-				dynamicSQLs.put(entity.getName(), dsql);
-			} else {
-				error("Not found dynamicSQL file.[" + entity.getFile() + "]");
-				throw new IOException("Not found dynamicSQL file.[" + entity.getFile() + "]");
+
+			InputStream is = context.getResourceAsStream(entity.getFile());
+			if (null == is) {
+				String msg = String.format("Not found dynamicSQL file.[ns:%s, name:%s, path:%s]", s(namespace), entity.getName(), entity.getFile());
+				error(msg);
+				throw new IOException(msg);
 			}
+
+			DSQLEntity dsql = DSQLEntity.getInstance(new InputStreamReader(is));
+			dsqlsMap.put(entity.getName(), dsql);
+
+			StringBuilder msg = new StringBuilder();
+			msg.append(String.format("DynamicSQL : %s", entity.getName()));
+			msg.append(System.lineSeparator());
+			msg.append(dsql.getPlainSQL());
+
+			debug(msg.toString());
 		}
 	}
 
 	/**
 	 * ダイナミックSQLを生成する。
 	 * 
-	 * @param aName 名前
-	 * @param aGroup グループ
-	 * @param aParameter パラメーター
-	 * @return ダイナミックSQL
+	 * @param namespace 名前空間
+	 * @param name 名前
+	 * @return ダイナミックSQLエンティティ
 	 */
-	private DSQLEntity doGet(final String aName) {
-		return dynamicSQLs.get(aName);
+	private DSQLEntity get(final String namespace, final String name) {
+		DSQLEntity entity = null;
+		if (dynamicSQLs.containsKey(namespace)) {
+			Map<String, DSQLEntity> dsqls = dynamicSQLs.get(namespace);
+			if (dsqls.containsKey(name)) {
+				entity = dsqls.get(name);
+			}
+		}
+		return entity;
+	}
+
+	private static String s(final String string) {
+		if (null == string) {
+			return "";
+		}
+		return string;
 	}
 
 	/**
@@ -183,28 +339,57 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @version 1.0.0 2013/02/15
 	 * @author Kawakicchi
 	 */
-	public static class DynamicSQLEntity {
+	public static class DynamicSQLXMLEntity {
 
+		/**
+		 * ダイナミックSQL名
+		 */
 		private String name;
 
+		/**
+		 * ダイナミックSQLファイル
+		 */
 		private String file;
 
-		public DynamicSQLEntity() {
+		/**
+		 * コンストラクタ
+		 */
+		public DynamicSQLXMLEntity() {
 
 		}
 
-		public void setName(final String aName) {
-			name = aName;
+		/**
+		 * ダイナミックSQL名を設定する。
+		 * 
+		 * @param name
+		 */
+		public void setName(final String name) {
+			this.name = name;
 		}
 
+		/**
+		 * ダイナミックSQL名を取得する。
+		 * 
+		 * @return
+		 */
 		public String getName() {
 			return name;
 		}
 
-		public void setFile(final String aFile) {
-			file = aFile;
+		/**
+		 * ダイナミックSQLファイルを設定する。
+		 * 
+		 * @param aFile ファイル
+		 */
+		public void setFile(final String file) {
+			this.file = file;
 		}
 
+		/**
+		 * ダイナミックSQLファイルを取得する。
+		 * 
+		 * @return ファイル
+		 */
 		public String getFile() {
 			return file;
 		}

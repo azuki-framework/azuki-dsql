@@ -1,0 +1,8 @@
+# test04.dsql
+                SELECT
+                    A.id
+                  , A.name
+                FROM
+                    table A
+                WHERE
+${ages}             A.age IN( ? )

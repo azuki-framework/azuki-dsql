@@ -21,14 +21,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.azkfw.util.StringUtility;
 
 /**
  * このクラスは、ダイナミックSQL情報を保持するエンティティクラスです。
@@ -40,14 +40,14 @@ import org.azkfw.util.StringUtility;
 public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 
 	/**
-	 * Dyanamic pattern
+	 * Bind line pattern
 	 */
-	private static Pattern PATTERN = Pattern.compile("^\\$\\{.*\\}.*$");
+	private static Pattern PTN_MATCH_BIND_LINE = Pattern.compile("^[\\s\\t]*(\\$\\{.+\\}).*$");
 
 	/**
-	 * 名前
+	 * Comment line pattern
 	 */
-	private String name;
+	private static Pattern PTN_MATCH_COMMENT_LINE = Pattern.compile("^[\\s\\t]*#.*");
 
 	/**
 	 * 行情報
@@ -58,36 +58,42 @@ public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 	 * コンストラクタ
 	 */
 	private DSQLEntity() {
-		name = null;
 		lines = new ArrayList<DSQLLineEntity>();
 	}
 
 	/**
-	 * 名前を設定する。
+	 * 行情報リストを取得する。
 	 * 
-	 * @param aName 名前
+	 * @return 行情報リスト
 	 */
-	public void setName(final String aName) {
-		name = aName;
+	public List<DSQLLineEntity> getLineList() {
+		return lines;
 	}
 
 	/**
-	 * 名前を取得する。
+	 * SQLを取得する。
+	 * <p>
+	 * <ul>
+	 * <li>コメントあり</li>
+	 * <li>バインドキーあり</li>
+	 * <li>改行コードあり</li>
+	 * </ul>
+	 * </p>
 	 * 
-	 * @return 名前
+	 * @return SQL
 	 */
-	public String getName() {
-		return name;
-	}
-
-	public void add(final DSQLLineEntity aLine) {
-		lines.add(aLine);
+	public String getPlainSQL() {
+		StringBuilder s = new StringBuilder();
+		for (DSQLLineEntity line : this) {
+			if (0 != s.length()) {
+				s.append(System.lineSeparator());
+			}
+			s.append(line.getLine());
+		}
+		return s.toString();
 	}
 
 	public boolean isEmpty() {
-		if (StringUtility.isNotEmpty(name)) {
-			return false;
-		}
 		if (0 < lines.size()) {
 			return false;
 		}
@@ -107,58 +113,102 @@ public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 		return getInstance(new InputStreamReader(new FileInputStream(file), charset));
 	}
 
+	public static DSQLEntity getInstance(final InputStream stream, final Charset charset) throws IOException {
+		return getInstance(new InputStreamReader(stream, charset));
+	}
+
 	public static DSQLEntity getInstance(final InputStreamReader aReader) throws IOException {
-		BufferedReader reader = new BufferedReader(aReader);
 		DSQLEntity dsql = new DSQLEntity();
-		String line = null;
-		while (null != (line = reader.readLine())) {
-			String buf = line.trim();
-			DSQLLineEntity dsqll = new DSQLLineEntity();
-			if (buf.startsWith("#")) {
-				dsqll.setComment(true);
-				dsqll.setString(line);
-			} else {
-				if (PATTERN.matcher(buf).matches()) {
-					int index = buf.indexOf("}");
-					String sql = buf.substring(index + 1).trim();
-					String cnt = buf.substring(2, index).trim();
-					index = cnt.indexOf(":");
-					if (0 == index) {
-						String param = cnt.substring(1).trim();
-						dsqll.setComment(false);
-						dsqll.setParameter(param);
-						dsqll.setSql(sql);
-						dsqll.setString(line);
-					} else if (cnt.length() - 1 == index) {
-						String group = cnt.substring(0, cnt.length() - 1);
-						dsqll.setComment(false);
-						dsqll.setGroup(group);
-						dsqll.setSql(sql);
-						dsqll.setString(line);
-					} else if (-1 == index) {
-						dsqll.setComment(false);
-						dsqll.setParameter(cnt);
-						dsqll.setSql(sql);
-						dsqll.setString(line);
-					} else {
-						String[] splt = cnt.split(":");
-						String group = splt[0];
-						String param = splt[1];
-						dsqll.setComment(false);
-						dsqll.setGroup(group);
-						dsqll.setParameter(param);
-						dsqll.setSql(sql);
-						dsqll.setString(line);
-					}
+
+		if (null != aReader) {
+			BufferedReader reader = null;
+			reader = new BufferedReader(aReader);
+
+			String line = null;
+			while (null != (line = reader.readLine())) {
+				DSQLLineEntity dsqll = new DSQLLineEntity();
+				dsqll.setLine(line);
+
+				if (PTN_MATCH_COMMENT_LINE.matcher(line).matches()) {
+					dsqll.setComment(true);
+
 				} else {
 					dsqll.setComment(false);
-					dsqll.setSql(buf);
-					dsqll.setString(line);
+
+					Matcher m = PTN_MATCH_BIND_LINE.matcher(line);
+					if (!m.find()) {
+						// SQL行
+						dsqll.setSQL(trim(line));
+						dsqll.setFormatSQL(trimSuffix(line));
+					} else {
+						// バインドSQL行
+						int idxBindStart = m.start(1);
+						int idxBindEnd = m.end(1);
+
+						String trimSql = trim(line.substring(idxBindEnd));
+						dsqll.setSQL(trimSql);
+
+						String formatSql = line.substring(0, idxBindStart) + space(idxBindEnd - idxBindStart) + line.substring(idxBindEnd);
+						dsqll.setFormatSQL(trimSuffix(formatSql));
+
+						String bind = trim(line.substring(idxBindStart + 2, idxBindEnd - 1));
+						int idxGrpSpr = bind.indexOf(":");
+
+						if (0 == idxGrpSpr) {
+							// ${:parameter}
+							String param = trim(bind.substring(1));
+							dsqll.setParameter(param);
+						} else if (bind.length() - 1 == idxGrpSpr) {
+							// ${group:}
+							String group = trim(bind.substring(0, bind.length() - 1));
+							dsqll.setGroup(group);
+						} else if (-1 == idxGrpSpr) {
+							// ${parameter}
+							dsqll.setParameter(bind);
+						} else {
+							// ${group:parameter}
+							String[] splt = bind.split(":");
+							String group = trim(splt[0]);
+							String param = trim(splt[1]);
+							dsqll.setGroup(group);
+							dsqll.setParameter(param);
+						}
+					}
 				}
+				dsql.lines.add(dsqll);
 			}
-			dsql.add(dsqll);
+			reader.close();
+
 		}
-		reader.close();
 		return dsql;
+	}
+
+	private static String trimPrefix(final String s) {
+		String buf = s;
+		while (0 < buf.length() && (buf.startsWith(" ") || buf.startsWith("\t"))) {
+			buf = buf.substring(1);
+		}
+		return buf;
+	}
+
+	private static String trimSuffix(final String s) {
+		String buf = s;
+		while (0 < buf.length() && (buf.endsWith(" ") || buf.endsWith("\t"))) {
+			buf = buf.substring(0, buf.length() - 1);
+		}
+		return buf;
+	}
+
+	private static String trim(final String s) {
+		String buf = trimPrefix(s);
+		return trimSuffix(buf);
+	}
+
+	private static String space(final int size) {
+		StringBuilder s = new StringBuilder();
+		for (int i = 0; i < size; i++) {
+			s.append(" ");
+		}
+		return s.toString();
 	}
 }

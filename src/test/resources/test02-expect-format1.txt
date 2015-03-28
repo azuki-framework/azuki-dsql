@@ -1,0 +1,6 @@
+                SELECT
+                    A.id
+                  , A.name
+                FROM
+                    table A
+                WHERE

@@ -1,0 +1,12 @@
+# test03.dsql
+                SELECT
+${COUNT:}           count(*)
+${SELECT:}          A.id
+${SELECT:}        , A.name
+                FROM
+                    table A
+                WHERE
+${name}             A.name like '%' & ? & '%'
+${AGE:}         AND A.age
+${AGE:fromAge}      BETWEEN ?
+${AGE:toAge}        AND     ?

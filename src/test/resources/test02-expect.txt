@@ -1,0 +1,8 @@
+# test02.dsql
+                SELECT
+                    A.id
+                  , A.name
+                FROM
+                    table A
+                WHERE
+${id}               A.id = ?

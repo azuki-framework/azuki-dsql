@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * このクラスは、グループ情報を保持するクラスです。
+ * このクラスは、DynamicSQLグループ情報を保持するクラスです。
  * 
  * @since 1.0.0
  * @version 1.0.0 2013/02/14
@@ -45,55 +45,64 @@ public final class Group {
 	/**
 	 * コンストラクタ
 	 * 
-	 * @param aGroups グループ
+	 * @param groups グループ配列
 	 */
-	public Group(final String... aGroups) {
-		groups = new HashSet<String>();
-		for (String group : aGroups) {
-			groups.add(group);
+	public Group(final String... groups) {
+		this.groups = new HashSet<String>();
+		for (String group : groups) {
+			this.groups.add(group);
 		}
 	}
 
 	/**
 	 * コンストラクタ
 	 * 
-	 * @param aGroups グループ
+	 * @param groups グループリスト
 	 */
-	public Group(final List<String> aGroups) {
-		groups = new HashSet<String>();
-		for (String group : aGroups) {
-			groups.add(group);
+	public Group(final List<String> groups) {
+		this.groups = new HashSet<String>();
+		for (String group : groups) {
+			this.groups.add(group);
 		}
 	}
 
 	/**
 	 * コンストラクタ
 	 * 
-	 * @param aGroup グループ
+	 * @param group グループ情報
 	 */
-	public Group(final Group aGroup) {
-		for (String group : aGroup.groups) {
-			groups.add(group);
+	public Group(final Group group) {
+		for (String g : group.groups) {
+			this.groups.add(g);
 		}
 	}
 
 	/**
 	 * グループを追加する。
 	 * 
-	 * @param aGroup グループ
+	 * @param group グループ
 	 */
-	public void add(final String aGroup) {
-		groups.add(aGroup);
+	public void add(final String group) {
+		groups.add(group);
 	}
 
 	/**
 	 * グループが存在するか判断する。
 	 * 
-	 * @param aGroup グループ
+	 * @param group グループ
 	 * @return グループが存在する場合、<code>true</code>を返す。
 	 */
-	public boolean is(final String aGroup) {
-		return groups.contains(aGroup);
+	public boolean is(final String group) {
+		return groups.contains(group);
+	}
+
+	/**
+	 * グループを削除する。
+	 * 
+	 * @param group グループ
+	 */
+	public void remove(final String group) {
+		groups.remove(group);
 	}
 
 	/**
