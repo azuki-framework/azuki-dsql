@@ -50,6 +50,11 @@ public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 	private static Pattern PTN_MATCH_COMMENT_LINE = Pattern.compile("^[\\s\\t]*#.*");
 
 	/**
+	 * ダイナミックSQL名
+	 */
+	private String name;
+
+	/**
 	 * 行情報
 	 */
 	private List<DSQLLineEntity> lines;
@@ -57,8 +62,18 @@ public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 	/**
 	 * コンストラクタ
 	 */
-	private DSQLEntity() {
+	private DSQLEntity(final String name) {
+		this.name = name;
 		lines = new ArrayList<DSQLLineEntity>();
+	}
+
+	/**
+	 * ダイナミックSQL名を取得する。
+	 * 
+	 * @return ダイナミックSQL名
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -93,6 +108,11 @@ public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 		return s.toString();
 	}
 
+	/**
+	 * Empty判断
+	 * 
+	 * @return 判断結果
+	 */
 	public boolean isEmpty() {
 		if (0 < lines.size()) {
 			return false;
@@ -105,20 +125,54 @@ public final class DSQLEntity implements Iterable<DSQLLineEntity> {
 		return lines.iterator();
 	}
 
-	public static DSQLEntity getInstance(final File file) throws IOException {
-		return getInstance(new InputStreamReader(new FileInputStream(file)));
+	/**
+	 * ファイルよりダイナミックSQLインスタンスを取得する。
+	 * 
+	 * @param name 名前
+	 * @param file ダイナミックSQLファイル
+	 * @return ダイナミックSQL
+	 * @throws IOException IO操作に起因する問題が発生した場合
+	 */
+	public static DSQLEntity getInstance(final String name, final File file) throws IOException {
+		return getInstance(name, new InputStreamReader(new FileInputStream(file)));
 	}
 
-	public static DSQLEntity getInstance(final File file, final Charset charset) throws IOException {
-		return getInstance(new InputStreamReader(new FileInputStream(file), charset));
+	/**
+	 * ファイルよりダイナミックSQLインスタンスを取得する。
+	 * 
+	 * @param name 名前
+	 * @param file ダイナミックSQLファイル
+	 * @param charset ファイル文字コード
+	 * @return ダイナミックSQL
+	 * @throws IOException IO操作に起因する問題が発生した場合
+	 */
+	public static DSQLEntity getInstance(final String name, final File file, final Charset charset) throws IOException {
+		return getInstance(name, new InputStreamReader(new FileInputStream(file), charset));
 	}
 
-	public static DSQLEntity getInstance(final InputStream stream, final Charset charset) throws IOException {
-		return getInstance(new InputStreamReader(stream, charset));
+	/**
+	 * ファイルよりダイナミックSQLインスタンスを取得する。
+	 * 
+	 * @param name 名前
+	 * @param stream ダイナミックSQLストリーム
+	 * @param charset ファイル文字コード
+	 * @return ダイナミックSQL
+	 * @throws IOException IO操作に起因する問題が発生した場合
+	 */
+	public static DSQLEntity getInstance(final String name, final InputStream stream, final Charset charset) throws IOException {
+		return getInstance(name, new InputStreamReader(stream, charset));
 	}
 
-	public static DSQLEntity getInstance(final InputStreamReader aReader) throws IOException {
-		DSQLEntity dsql = new DSQLEntity();
+	/**
+	 * ファイルよりダイナミックSQLインスタンスを取得する。
+	 * 
+	 * @param name 名前
+	 * @param aReader ダイナミックSQLリーダー
+	 * @return ダイナミックSQL
+	 * @throws IOException IO操作に起因する問題が発生した場合
+	 */
+	public static DSQLEntity getInstance(final String name, final InputStreamReader aReader) throws IOException {
+		DSQLEntity dsql = new DSQLEntity(name);
 
 		if (null != aReader) {
 			BufferedReader reader = null;

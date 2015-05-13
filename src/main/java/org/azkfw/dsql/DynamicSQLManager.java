@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,21 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * Instance
 	 */
 	private static final DynamicSQLManager INSTANCE = new DynamicSQLManager();
+
+	/**
+	 * デフォルト名前空間
+	 */
+	private static final String DEFAULT_NAMESPACE = "";
+
+	/**
+	 * DSQLEntityソート用Comparator
+	 */
+	private static final Comparator<DSQLEntity> SORT_DSQLENTITY = new Comparator<DSQLEntity>() {
+		@Override
+		public int compare(final DSQLEntity e1, final DSQLEntity e2) {
+			return e1.getName().compareTo(e2.getName());
+		}
+	};
 
 	/**
 	 * ダイナミックSQL情報
@@ -79,7 +96,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
 	 */
 	public static DynamicSQL generate(final String name) {
-		return generate(null, name, null, null);
+		return generate(DEFAULT_NAMESPACE, name, null, null);
 	}
 
 	/**
@@ -90,7 +107,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
 	 */
 	public static DynamicSQL generate(final String name, final Group group) {
-		return generate(null, name, group, null);
+		return generate(DEFAULT_NAMESPACE, name, group, null);
 	}
 
 	/**
@@ -101,7 +118,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
 	 */
 	public static DynamicSQL generate(final String name, final Parameter parameter) {
-		return generate(null, name, null, parameter);
+		return generate(DEFAULT_NAMESPACE, name, null, parameter);
 	}
 
 	/**
@@ -113,7 +130,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @return ダイナミックSQL。ダイナミックSQLの生成に失敗した場合、<code>null</code>を返す。
 	 */
 	public static DynamicSQL generate(final String name, final Group group, final Parameter parameter) {
-		return generate(null, name, group, parameter);
+		return generate(DEFAULT_NAMESPACE, name, group, parameter);
 	}
 
 	/**
@@ -191,7 +208,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @throws IOException IO操作時に問題が発生した場合
 	 */
 	public void load(final String config, final Context context) throws IOException {
-		doLoad(null, config, context);
+		doLoad(DEFAULT_NAMESPACE, config, context);
 	}
 
 	/**
@@ -214,7 +231,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @throws IOException IO操作時に問題が発生した場合
 	 */
 	public void load(final InputStream stream, final Context context) throws IOException {
-		doLoad(null, stream, context);
+		doLoad(DEFAULT_NAMESPACE, stream, context);
 	}
 
 	/**
@@ -227,6 +244,34 @@ public final class DynamicSQLManager extends LoggingObject {
 	 */
 	public void load(final String namespace, final InputStream stream, final Context context) throws IOException {
 		doLoad(namespace, stream, context);
+	}
+
+	/**
+	 * デフォルトのDSQLエンティティ情報リストを取得する。
+	 * 
+	 * @return リスト
+	 */
+	public List<DSQLEntity> getDSQLEntityList() {
+		return getDSQLEntityList(DEFAULT_NAMESPACE);
+	}
+
+	/**
+	 * 指定された名前空間のDSQLエンティティ情報リストを取得する。
+	 * 
+	 * @param namespace 名前空間
+	 * @return リスト
+	 */
+	public List<DSQLEntity> getDSQLEntityList(final String namespace) {
+		List<DSQLEntity> result = new ArrayList<DSQLEntity>();
+		if (dynamicSQLs.containsKey(namespace)) {
+			Map<String, DSQLEntity> dsqls = dynamicSQLs.get(namespace);
+			for (String name : dsqls.keySet()) {
+				DSQLEntity dsql = dsqls.get(name);
+				result.add(dsql);
+			}
+		}
+		Collections.sort(result, SORT_DSQLENTITY);
+		return result;
 	}
 
 	/**
@@ -295,7 +340,7 @@ public final class DynamicSQLManager extends LoggingObject {
 				throw new IOException(msg);
 			}
 
-			DSQLEntity dsql = DSQLEntity.getInstance(new InputStreamReader(is));
+			DSQLEntity dsql = DSQLEntity.getInstance(entity.getName(), new InputStreamReader(is));
 			dsqlsMap.put(entity.getName(), dsql);
 
 			StringBuilder msg = new StringBuilder();

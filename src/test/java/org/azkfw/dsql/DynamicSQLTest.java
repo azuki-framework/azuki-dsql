@@ -53,7 +53,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test01", dsql.getName());
 		assertEquals("パラメータ数", 0, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test01-expect-execute1.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test01-expect-format1.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test01-expect-format1.txt", "\n"), dsql.getFormatSQL());
 
 	}
 
@@ -68,7 +68,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test02", dsql.getName());
 		assertEquals("パラメータ数", 0, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test02-expect-execute1.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test02-expect-format1.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test02-expect-format1.txt", "\n"), dsql.getFormatSQL());
 
 		params.clear();
 		params.put("id", 1);
@@ -78,7 +78,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test02", dsql.getName());
 		assertEquals("パラメータ数", 1, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test02-expect-execute2.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test02-expect-format2.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test02-expect-format2.txt", "\n"), dsql.getFormatSQL());
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test03", dsql.getName());
 		assertEquals("パラメータ数", 0, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test03-expect-execute1.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test03-expect-format1.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test03-expect-format1.txt", "\n"), dsql.getFormatSQL());
 
 		group.clear();
 		group.add("COUNT");
@@ -106,7 +106,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test03", dsql.getName());
 		assertEquals("パラメータ数", 1, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test03-expect-execute2.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test03-expect-format2.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test03-expect-format2.txt", "\n"), dsql.getFormatSQL());
 
 		group.clear();
 		group.add("SELECT");
@@ -122,7 +122,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test03", dsql.getName());
 		assertEquals("パラメータ数", 3, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test03-expect-execute3.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test03-expect-format3.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test03-expect-format3.txt", "\n"), dsql.getFormatSQL());
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test04", dsql.getName());
 		assertEquals("パラメータ数", 0, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test04-expect-execute1.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test04-expect-format1.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test04-expect-format1.txt", "\n"), dsql.getFormatSQL());
 
 		params.clear();
 		params.put("ages", 1);
@@ -147,7 +147,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test04", dsql.getName());
 		assertEquals("パラメータ数", 1, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test04-expect-execute2.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test04-expect-format2.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test04-expect-format2.txt", "\n"), dsql.getFormatSQL());
 
 		ages.add(1);
 		params.clear();
@@ -158,7 +158,7 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test04", dsql.getName());
 		assertEquals("パラメータ数", 1, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test04-expect-execute2.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test04-expect-format2.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test04-expect-format2.txt", "\n"), dsql.getFormatSQL());
 
 		ages.add(2);
 		params.clear();
@@ -169,6 +169,6 @@ public class DynamicSQLTest extends DsqlTestCase {
 		assertEquals("名前", "test04", dsql.getName());
 		assertEquals("パラメータ数", 2, dsql.getParameters().size());
 		assertEquals("実行SQL", readTestTextFile("/test04-expect-execute3.txt"), dsql.getExecuteSQL());
-		assertEquals("整形SQL", readTestTextFile("/test04-expect-format3.txt"), dsql.getFormatSQL());
+		assertEquals("整形SQL", readTestTextFile("/test04-expect-format3.txt", "\n"), dsql.getFormatSQL());
 	}
 }

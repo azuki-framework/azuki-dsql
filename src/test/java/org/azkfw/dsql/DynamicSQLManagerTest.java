@@ -18,7 +18,9 @@
 package org.azkfw.dsql;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.azkfw.dsql.entity.DSQLEntity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +43,12 @@ public class DynamicSQLManagerTest extends DsqlTestCase {
 	}
 
 	@Test
+	public void testLoad() throws IOException {
+		DynamicSQLManager.getInstance().load("/dynamicSQL01.xml", getTestContext());
+
+	}
+
+	@Test
 	public void testNoNamespace() throws IOException {
 		DynamicSQLManager.getInstance().load("/dynamicSQL01.xml", getTestContext());
 
@@ -50,17 +58,25 @@ public class DynamicSQLManagerTest extends DsqlTestCase {
 		assertNotNull(DynamicSQLManager.generate("test04"));
 		assertNull(DynamicSQLManager.generate("test99"));
 
-		assertNotNull(DynamicSQLManager.generate(null, "test01"));
-		assertNotNull(DynamicSQLManager.generate(null, "test02"));
-		assertNotNull(DynamicSQLManager.generate(null, "test03"));
-		assertNotNull(DynamicSQLManager.generate(null, "test04"));
-		assertNull(DynamicSQLManager.generate(null, "test99"));
-
 		assertNull(DynamicSQLManager.generate("ns", "test01"));
 		assertNull(DynamicSQLManager.generate("ns", "test02"));
 		assertNull(DynamicSQLManager.generate("ns", "test03"));
 		assertNull(DynamicSQLManager.generate("ns", "test04"));
 		assertNull(DynamicSQLManager.generate("ns", "test99"));
+
+		List<DSQLEntity> dsqls = DynamicSQLManager.getInstance().getDSQLEntityList();
+		assertNotNull("インスタンス", dsqls);
+		assertEquals("件数", 4, dsqls.size());
+		DSQLEntity dsql = null;
+
+		dsql = dsqls.get(0);
+		assertEquals("名前", "test01", dsql.getName());
+		dsql = dsqls.get(1);
+		assertEquals("名前", "test02", dsql.getName());
+		dsql = dsqls.get(2);
+		assertEquals("名前", "test03", dsql.getName());
+		dsql = dsqls.get(3);
+		assertEquals("名前", "test04", dsql.getName());
 	}
 
 	@Test
@@ -73,16 +89,25 @@ public class DynamicSQLManagerTest extends DsqlTestCase {
 		assertNull(DynamicSQLManager.generate("test04"));
 		assertNull(DynamicSQLManager.generate("test99"));
 
-		assertNull(DynamicSQLManager.generate(null, "test01"));
-		assertNull(DynamicSQLManager.generate(null, "test02"));
-		assertNull(DynamicSQLManager.generate(null, "test03"));
-		assertNull(DynamicSQLManager.generate(null, "test04"));
-		assertNull(DynamicSQLManager.generate(null, "test99"));
-
 		assertNotNull(DynamicSQLManager.generate("ns", "test01"));
 		assertNotNull(DynamicSQLManager.generate("ns", "test02"));
 		assertNotNull(DynamicSQLManager.generate("ns", "test03"));
 		assertNotNull(DynamicSQLManager.generate("ns", "test04"));
 		assertNull(DynamicSQLManager.generate("ns", "test99"));
+
+		List<DSQLEntity> dsqls = DynamicSQLManager.getInstance().getDSQLEntityList("ns");
+		assertNotNull("インスタンス", dsqls);
+		assertEquals("件数", 4, dsqls.size());
+		DSQLEntity dsql = null;
+
+		dsql = dsqls.get(0);
+		assertEquals("名前", "test01", dsql.getName());
+		dsql = dsqls.get(1);
+		assertEquals("名前", "test02", dsql.getName());
+		dsql = dsqls.get(2);
+		assertEquals("名前", "test03", dsql.getName());
+		dsql = dsqls.get(3);
+		assertEquals("名前", "test04", dsql.getName());
 	}
+
 }

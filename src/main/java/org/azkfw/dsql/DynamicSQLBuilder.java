@@ -33,6 +33,11 @@ import org.azkfw.dsql.entity.DSQLLineEntity;
 public final class DynamicSQLBuilder {
 
 	/**
+	 * 成形用改行コード
+	 */
+	private static final String formatLineSeparator = "\n";
+
+	/**
 	 * コンストラクタ
 	 * <p>
 	 * インスタンス生成を禁止
@@ -189,7 +194,7 @@ public final class DynamicSQLBuilder {
 
 				if (0 < sqlExecute.length()) {
 					sqlExecute.append(" ");
-					sqlFormat.append("\n");
+					sqlFormat.append(formatLineSeparator);
 				}
 				sqlExecute.append(executeSql);
 				sqlFormat.append(formatSql);

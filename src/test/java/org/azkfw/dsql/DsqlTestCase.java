@@ -41,6 +41,10 @@ public abstract class DsqlTestCase extends TestCase {
 	}
 
 	protected String readTestTextFile(final String name) {
+		return readTestTextFile(name, System.lineSeparator());
+	}
+
+	protected String readTestTextFile(final String name, final String lineSeparator) {
 		StringBuilder s = new StringBuilder();
 
 		BufferedReader reader = null;
@@ -49,7 +53,7 @@ public abstract class DsqlTestCase extends TestCase {
 			String line;
 			while (null != (line = reader.readLine())) {
 				if (0 != s.length()) {
-					s.append(System.lineSeparator());
+					s.append(lineSeparator);
 				}
 				s.append(line);
 			}

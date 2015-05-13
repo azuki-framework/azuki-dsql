@@ -33,12 +33,13 @@ public class DSQLEntityTest extends DsqlTestCase {
 
 	@Test
 	public void test01() throws IOException {
-		DSQLEntity entity = DSQLEntity.getInstance(this.getClass().getResourceAsStream("/test01.txt"), Charset.forName("UTF-8"));
+		DSQLEntity entity = DSQLEntity.getInstance("test01", this.getClass().getResourceAsStream("/test01.txt"), Charset.forName("UTF-8"));
 
 		assertFalse("Emptyチェック", entity.isEmpty());
+		assertEquals("名前", "test01", entity.getName());
 
 		assertEquals("SQL", readTestTextFile("/test01-expect.txt"), entity.getPlainSQL());
-
+		
 		List<DSQLLineEntity> lines = entity.getLineList();
 		assertNotNull("インスタンス", lines);
 		assertEquals("行数", 5, lines.size());
@@ -69,9 +70,10 @@ public class DSQLEntityTest extends DsqlTestCase {
 
 	@Test
 	public void test02() throws IOException {
-		DSQLEntity entity = DSQLEntity.getInstance(this.getClass().getResourceAsStream("/test02.txt"), Charset.forName("UTF-8"));
+		DSQLEntity entity = DSQLEntity.getInstance("test02",this.getClass().getResourceAsStream("/test02.txt"), Charset.forName("UTF-8"));
 
 		assertFalse("Emptyチェック", entity.isEmpty());
+		assertEquals("名前", "test02", entity.getName());
 
 		assertEquals("SQL", readTestTextFile("/test02-expect.txt"), entity.getPlainSQL());
 
@@ -118,9 +120,10 @@ public class DSQLEntityTest extends DsqlTestCase {
 
 	@Test
 	public void test03() throws IOException {
-		DSQLEntity entity = DSQLEntity.getInstance(this.getClass().getResourceAsStream("/test03.txt"), Charset.forName("UTF-8"));
+		DSQLEntity entity = DSQLEntity.getInstance("test03",this.getClass().getResourceAsStream("/test03.txt"), Charset.forName("UTF-8"));
 
 		assertFalse("Emptyチェック", entity.isEmpty());
+		assertEquals("名前", "test03", entity.getName());
 
 		assertEquals("SQL", readTestTextFile("/test03-expect.txt"), entity.getPlainSQL());
 
@@ -191,9 +194,10 @@ public class DSQLEntityTest extends DsqlTestCase {
 
 	@Test
 	public void test04() throws IOException {
-		DSQLEntity entity = DSQLEntity.getInstance(this.getClass().getResourceAsStream("/test04.txt"), Charset.forName("UTF-8"));
+		DSQLEntity entity = DSQLEntity.getInstance("test04",this.getClass().getResourceAsStream("/test04.txt"), Charset.forName("UTF-8"));
 
 		assertFalse("Emptyチェック", entity.isEmpty());
+		assertEquals("名前", "test04", entity.getName());
 
 		assertEquals("SQL", readTestTextFile("/test04-expect.txt"), entity.getPlainSQL());
 
@@ -240,10 +244,11 @@ public class DSQLEntityTest extends DsqlTestCase {
 
 	@Test
 	public void test10() throws IOException {
-		DSQLEntity entity = DSQLEntity.getInstance(this.getClass().getResourceAsStream("/test10.txt"), Charset.forName("UTF-8"));
+		DSQLEntity entity = DSQLEntity.getInstance("test10",this.getClass().getResourceAsStream("/test10.txt"), Charset.forName("UTF-8"));
 
 		List<DSQLLineEntity> lines = entity.getLineList();
 		assertNotNull("インスタンス", lines);
+		assertEquals("名前", "test10", entity.getName());
 		//assertEquals("行数", 8, lines.size());
 
 		DSQLLineEntity line = null;
