@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.digester3.Digester;
+import org.apache.commons.digester.Digester;
 import org.azkfw.context.Context;
 import org.azkfw.dsql.entity.DSQLEntity;
 import org.azkfw.lang.LoggingObject;
@@ -300,6 +300,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * @param context コンテキスト情報
 	 * @throws IOException IO操作時に問題が発生した場合
 	 */
+	@SuppressWarnings("unchecked")
 	private synchronized void doLoad(final String namespace, final InputStream stream, final Context context) throws IOException {
 		List<DynamicSQLXMLEntity> dsqls = null;
 		try {
@@ -308,7 +309,7 @@ public final class DynamicSQLManager extends LoggingObject {
 			digester.addObjectCreate("azuki/dynamicSQLs/dynamicSQL", DynamicSQLXMLEntity.class);
 			digester.addSetProperties("azuki/dynamicSQLs/dynamicSQL");
 			digester.addSetNext("azuki/dynamicSQLs/dynamicSQL", "add");
-			dsqls = digester.parse(stream);
+			dsqls = (List<DynamicSQLXMLEntity>)digester.parse(stream);
 		} catch (SAXException ex) {
 			error(ex);
 			throw new IOException(ex);
