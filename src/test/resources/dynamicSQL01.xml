@@ -13,21 +13,21 @@
   limitations under the License. See accompanying LICENSE file.
 -->
 <!DOCTYPE azuki[
-  <!ELEMENT azuki       (dynamicSQLs)>
-  <!ELEMENT dynamicSQLs (dynamicSQL*)>
+  <!ELEMENT azuki-dynamicSQL  (dynamicSQL-list)>
+  <!ELEMENT dynamicSQL-list   (dynamicSQL*    )>
   
   <!ATTLIST dynamicSQL
         name CDATA #REQUIRED
         file CDATA #REQUIRED
         >
 ]>
-<azuki>
+<azuki-dynamicSQL>
 
-	<dynamicSQLs>
+	<dynamicSQL-list>
 		<dynamicSQL name="test01" file="/test01.txt" />
 		<dynamicSQL name="test02" file="/test02.txt" />
 		<dynamicSQL name="test03" file="/test03.txt" />
 		<dynamicSQL name="test04" file="/test04.txt" />
-	</dynamicSQLs>
+	</dynamicSQL-list>
 
-</azuki>
+</azuki-dynamicSQL>

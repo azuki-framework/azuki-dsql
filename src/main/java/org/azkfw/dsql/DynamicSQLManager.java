@@ -28,9 +28,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.digester.Digester;
+import org.apache.commons.digester.ObjectCreateRule;
+import org.apache.commons.digester.SetNextRule;
+import org.apache.commons.digester.SetPropertiesRule;
 import org.azkfw.context.Context;
 import org.azkfw.dsql.entity.DSQLEntity;
-import org.azkfw.lang.LoggingObject;
+import org.azkfw.log.LoggingObject;
 import org.azkfw.util.StringUtility;
 import org.xml.sax.SAXException;
 
@@ -75,8 +78,6 @@ public final class DynamicSQLManager extends LoggingObject {
 	 * </p>
 	 */
 	private DynamicSQLManager() {
-		super(DynamicSQLManager.class);
-
 		dynamicSQLs = new HashMap<String, Map<String, DSQLEntity>>();
 	}
 
@@ -304,11 +305,7 @@ public final class DynamicSQLManager extends LoggingObject {
 	private synchronized void doLoad(final String namespace, final InputStream stream, final Context context) throws IOException {
 		List<DynamicSQLXMLEntity> dsqls = null;
 		try {
-			Digester digester = new Digester();
-			digester.addObjectCreate("azuki/dynamicSQLs", ArrayList.class);
-			digester.addObjectCreate("azuki/dynamicSQLs/dynamicSQL", DynamicSQLXMLEntity.class);
-			digester.addSetProperties("azuki/dynamicSQLs/dynamicSQL");
-			digester.addSetNext("azuki/dynamicSQLs/dynamicSQL", "add");
+			Digester digester = getDigester();
 			dsqls = (List<DynamicSQLXMLEntity>)digester.parse(stream);
 		} catch (SAXException ex) {
 			error(ex);
@@ -352,7 +349,7 @@ public final class DynamicSQLManager extends LoggingObject {
 			debug(msg.toString());
 		}
 	}
-
+	
 	/**
 	 * ダイナミックSQLを生成する。
 	 * 
@@ -371,6 +368,15 @@ public final class DynamicSQLManager extends LoggingObject {
 		return entity;
 	}
 
+	private Digester getDigester() {
+		Digester digester = new Digester();
+		digester.addRule("azuki-dynamicSQL/dynamicSQL-list", new ObjectCreateRule(ArrayList.class));
+		digester.addRule("azuki-dynamicSQL/dynamicSQL-list/dynamicSQL", new ObjectCreateRule(DynamicSQLXMLEntity.class));
+		digester.addRule("azuki-dynamicSQL/dynamicSQL-list/dynamicSQL", new SetPropertiesRule());
+		digester.addRule("azuki-dynamicSQL/dynamicSQL-list/dynamicSQL", new SetNextRule("add"));
+		return digester;
+	}
+	
 	private static String s(final String string) {
 		if (null == string) {
 			return "";
